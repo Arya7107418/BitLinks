@@ -1,7 +1,6 @@
 "use client"
-
+import Link from 'next/link';
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
 
 const Shorten = () => {
   const [url, seturl] = useState("")
@@ -28,8 +27,8 @@ const Shorten = () => {
       .then((response) => response.json())
       .then((result) => {
         setGenerated(`${process.env.NEXT_PUBLIC_HOST}/${shorturl}`)
-        seturl(" ")
-        setshorturl(" ")
+        seturl("")
+        setshorturl("")
 
         console.log(result)
         alert(result.message)
@@ -56,12 +55,17 @@ const Shorten = () => {
         <button className='bg-purple-500 rounded-lg shadow-lg p-3 py-1 my-3
         font-bold text-white' onClick={generate} >Generate</button>
       </div>
-
-      {generated && <> 
-      <span className='font-bold text-lg'>Your Link </span><code><Link target="_blank" href={generated}>{generated}</Link> 
-      </code></> }
-
-    </div>
+      
+      {generated && ( <>
+    <span className="font-bold text-lg">Your Link: </span>
+    <code>
+      <Link target="_blank" href={generated}>
+        {generated}
+      </Link>
+    </code>
+  </>
+)}
+ </div>
   )
 }
 

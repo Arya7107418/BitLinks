@@ -16,7 +16,8 @@ export async function POST(request) {
     }
     const result = await collection.insertOne({
         url: body.url,
-        shorturl: body.shorturl
+        shorturl: body.shorturl,
+        clicks: 0  // Track number of visits
     })
 
     return Response.json({ success: true, error: false, message: 'URL Generated Successfully' })
