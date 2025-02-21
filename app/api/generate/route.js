@@ -1,24 +1,37 @@
-
-import clientPromise from "@/lib/mongodb"
+import clientPromise from "@/lib/mongodb";
 
 export async function POST(request) {
+    try {
+        const body = await request.json();
+        const client = await clientPromise;
+        const db = client.db("bitlinks");
+        const collection = db.collection("url");
 
-    const body = await request.json()
-    const client = await clientPromise;
-    const db = client.db("bitlinks")
-    const collection = db.collection("url")
+        // Check if short URL already exists
+        const doc = await collection.findOne({ shorturl: body.shorturl });
+        if (doc) {
+            return new Response(JSON.stringify({ success: false, message: "URL already exists!" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" }
+            });
+        }
 
-    // Check if the short urls exist
+        // Insert new short URL
+        await collection.insertOne({
+            url: body.url,
+            shorturl: body.shorturl,
+            clicks: 0  // Track number of visits
+        });
 
-    const doc = await collection.findOne({ shorturl: body.shorturl })
-    if(doc){
-        return Response.json({ success: false, error: true, message: 'URL already exists !' })
+        return new Response(JSON.stringify({ success: true, message: "URL Generated Successfully" }), {
+            status: 201,
+            headers: { "Content-Type": "application/json" }
+        });
+
+    } catch (error) {
+        return new Response(JSON.stringify({ success: false, message: "Server error", error: error.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" }
+        });
     }
-    const result = await collection.insertOne({
-        url: body.url,
-        shorturl: body.shorturl,
-        clicks: 0  // Track number of visits
-    })
-
-    return Response.json({ success: true, error: false, message: 'URL Generated Successfully' })
 }
